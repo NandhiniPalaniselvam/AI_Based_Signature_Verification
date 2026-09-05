@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verification History | Forensic Signature Analysis</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top right, #12345a 0%, transparent 35%),
+                radial-gradient(circle at bottom left, #071d31 0%, transparent 35%),
+                #030b14;
+            color: #e8f1f8;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            height: 70px;
+            background: rgba(3, 12, 22, 0.95);
+            border-bottom: 1px solid #1c5278;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 50px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #55c7ff;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #b8c8d6;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #55c7ff;
+        }
+
+        .nav-links .active {
+            color: #55c7ff;
+        }
+
+        /* MAIN */
+
+        .main {
+            width: 92%;
+            max-width: 1250px;
+            margin: 45px auto;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .page-title h1 {
+            font-size: 30px;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .page-title p {
+            margin-top: 8px;
+            color: #8195a6;
+            font-size: 14px;
+        }
+
+        /* FORENSIC HEADER */
+
+        .forensic-header {
+            background: rgba(8, 25, 40, 0.85);
+            border: 1px solid #174a6d;
+            border-left: 4px solid #32b9ff;
+
+            padding: 20px 25px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+        }
+
+        .forensic-header h3 {
+            color: #55c7ff;
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        .forensic-header p {
+            color: #8da3b5;
+            font-size: 13px;
+        }
+
+        /* TABLE CARD */
+
+        .history-card {
+            background: rgba(7, 20, 32, 0.95);
+            border: 1px solid #17425f;
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.45);
+        }
+
+        /* TABLE */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #0a1d2d;
+        }
+
+        th {
+            padding: 17px 15px;
+
+            color: #6fd0ff;
+            font-size: 12px;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+
+            border-bottom: 1px solid #1c4d6b;
+        }
+
+        td {
+            padding: 18px 15px;
+
+            text-align: center;
+
+            color: #b9c8d3;
+            font-size: 13px;
+
+            border-bottom: 1px solid #112f43;
+        }
+
+        tbody tr {
+            transition: 0.25s;
+        }
+
+        tbody tr:hover {
+            background: rgba(25, 80, 115, 0.15);
+        }
+
+        /* IMAGE NAME */
+
+        .image-name {
+            color: #d8e9f4;
+            font-family: monospace;
+        }
+
+        /* RESULT */
+
+        .genuine {
+            display: inline-block;
+
+            padding: 6px 13px;
+
+            border-radius: 20px;
+
+            background: rgba(0, 180, 120, 0.12);
+            border: 1px solid #00b878;
+
+            color: #2ee6a6;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .forged {
+            display: inline-block;
+
+            padding: 6px 13px;
+
+            border-radius: 20px;
+
+            background: rgba(230, 60, 60, 0.12);
+            border: 1px solid #e34c4c;
+
+            color: #ff6868;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* SCORE */
+
+        .score {
+            color: #55c7ff;
+            font-weight: bold;
+        }
+
+        /* DATE */
+
+        .date {
+            color: #91a5b5;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            padding: 50px;
+            text-align: center;
+            color: #718594;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #506575;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 900px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .main {
+                width: 96%;
+            }
+
+            .history-card {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 850px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        FORENSIC AI
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/verify">
+            Verify
+        </a>
+
+        <a href="/history" class="active">
+            History
+        </a>
+
+        <a href="/about">
+            About
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+
+    <!-- TITLE -->
+
+    <div class="page-title">
+
+        <h1>
+            Verification History
+        </h1>
+
+        <p>
+            Forensic Signature Verification Records
+        </p>
+
+    </div>
+
+
+    <!-- FORENSIC INFO -->
+
+    <div class="forensic-header">
+
+        <h3>
+            FORENSIC ANALYSIS RECORD
+        </h3>
+
+        <p>
+            All signature verification activities are securely recorded
+            with image references, similarity scores, results and timestamps.
+        </p>
+
+    </div>
+
+
+    <!-- HISTORY TABLE -->
+
+    <div class="history-card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Reference Image
+                    </th>
+
+                    <th>
+                        Original Image
+                    </th>
+
+                    <th>
+                        Result
+                    </th>
+
+                    <th>
+                        Similarity
+                    </th>
+
+                    <th>
+                        Date & Time
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for item in history %}
+
+                <tr>
+
+                    <td>
+
+                        <span class="image-name">
+                            {{ item.reference_image }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="image-name">
+                            {{ item.original_image }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if item.result == "Genuine" %}
+
+                            <span class="genuine">
+                                ✓ GENUINE
+                            </span>
+
+                        {% else %}
+
+                            <span class="forged">
+                                ✕ FORGED
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="score">
+                            {{ item.similarity }}%
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="date">
+                            {{ item.verify_date }}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="5">
+
+                        <div class="empty">
+
+                            No verification records found.
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+    AI Based Signature Verification for Forensic Document Analysis
+
+</div>
+
+
+</body>
+
+</html>
